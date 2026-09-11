@@ -4,89 +4,103 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>THE BOARD — current cases</title>
-  <meta name="description" content="Private corkboard for current cases, Court TV headlines, and notes. Unofficial. Presumed innocent." />
+  <meta name="description" content="A private corkboard for current cases, Court TV headlines, and notes." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&family=Oswald:wght@500;600&display=swap" rel="stylesheet" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='10' r='6' fill='%238b1e1e'/%3E%3Cpath d='M16 16 L16 28' stroke='%234a2a12' stroke-width='2'/%3E%3C/svg%3E" />
-  <style>
-    :root {
-      --cork: #c4a574;
-      --cork-dark: #8a6a3b;
-      --paper: #f3e6c4;
-      --ink: #1a1410;
-      --red: #8b1e1e;
-      --teal: #2f5d50;
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
-    body {
-      font-family: "Source Serif 4", Georgia, serif;
-      color: var(--ink);
-      background:
-        radial-gradient(ellipse at center, transparent 40%, rgba(40,20,8,.35) 100%),
-        repeating-linear-gradient(0deg, rgba(90,60,20,.07) 0 2px, transparent 2px 7px),
-        repeating-linear-gradient(90deg, rgba(90,60,20,.05) 0 2px, transparent 2px 9px),
-        linear-gradient(160deg, #d4b07a, #b0894f 55%, #9a7340);
-    }
-    .wrap {
-      max-width: 42rem;
-      margin: 12vh auto;
-      padding: 0 1.25rem 4rem;
-    }
-    .card {
-      background: var(--paper);
-      border: 1px solid rgba(60,40,10,.25);
-      box-shadow: 4px 8px 0 rgba(40,20,8,.18), 0 18px 40px rgba(20,10,0,.25);
-      padding: 2rem 2rem 1.6rem;
-      transform: rotate(-0.6deg);
-      position: relative;
-    }
-    .pin {
-      width: 18px; height: 18px;
-      background: radial-gradient(circle at 35% 30%, #e07070, var(--red) 60%, #4a0e0e);
-      border-radius: 50%;
-      position: absolute;
-      top: -8px; left: 50%;
-      transform: translateX(-50%);
-      box-shadow: 0 2px 3px rgba(0,0,0,.4);
-    }
-    .stamp {
-      font-family: "IBM Plex Mono", ui-monospace, monospace;
-      font-size: .72rem;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: var(--teal);
-      border: 2px solid var(--teal);
-      display: inline-block;
-      padding: .2rem .5rem;
-      margin-bottom: 1rem;
-    }
-    h1 {
-      font-family: "Arial Narrow", "Arial Black", Impact, sans-serif;
-      letter-spacing: .08em;
-      font-size: clamp(2rem, 6vw, 3.2rem);
-      margin: 0 0 .35rem;
-    }
-    .sub { margin: 0 0 1.25rem; opacity: .8; }
-    p { line-height: 1.5; }
-    .fine {
-      font-family: "IBM Plex Mono", ui-monospace, monospace;
-      font-size: .75rem;
-      color: #4a3a28;
-      margin-top: 1.5rem;
-    }
-    a { color: var(--red); }
-  </style>
+  <link rel="stylesheet" href="assets/app.css" />
 </head>
 <body>
-  <main class="wrap">
-    <article class="card">
-      <span class="pin" aria-hidden="true"></span>
-      <div class="stamp">Evidence · pending</div>
-      <h1>THE BOARD</h1>
-      <p class="sub">Current cases · Court TV wire · private notes</p>
-      <p>The cork is up. Case files, the wire, and the notebook are being assembled in this repo and will deploy here on every push to <code>main</code>.</p>
-      <p>Until then this page is only a holding pin so Netlify has something to publish.</p>
-      <p class="fine">Unofficial personal tracker. Not affiliated with Court TV, any court, or any party. Accused persons are presumed innocent. Not legal advice.</p>
-    </article>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="lamp" aria-hidden="true"></div>
+  <header class="topbar">
+    <div class="brand">
+      <span class="pinhead" aria-hidden="true"></span>
+      <div>
+        <h1>THE BOARD</h1>
+        <p>Current cases · Court TV wire · private notes</p>
+      </div>
+    </div>
+    <nav class="modes" id="modes">
+      <a href="#board" data-mode="board">Board</a>
+      <a href="#docket" data-mode="docket">Docket</a>
+      <a href="#wire" data-mode="wire">Wire</a>
+      <a href="#notebook" data-mode="notebook">Notebook</a>
+    </nav>
+    <div class="tools">
+      <input id="search" type="search" placeholder="Search the wall…" autocomplete="off" />
+      <button type="button" class="tagbtn" id="btnAddCase">+ Case</button>
+      <button type="button" class="tagbtn ghost" id="btnAddNote">+ Note</button>
+      <button type="button" class="iconbtn" id="btnSettings" title="Settings">⚙</button>
+      <span class="live" id="livePill">WIRE</span>
+    </div>
+  </header>
+  <main>
+    <section id="view-board" class="view board-view active">
+      <svg id="strings" class="strings"></svg>
+      <div id="board" class="board"></div>
+    </section>
+    <section id="view-docket" class="view">
+      <div class="panel"><div class="filters" id="docketFilters"></div>
+        <div class="tablewrap">
+          <table class="docket">
+            <thead><tr><th>Case</th><th>Status</th><th>Court</th><th>Next</th><th>Tags</th></tr></thead>
+            <tbody id="docketBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <section id="view-wire" class="view">
+      <div class="panel wire-head">
+        <div><h2>The wire</h2><p class="muted" id="wireMeta">Fetching Court TV feed…</p></div>
+        <button type="button" class="tagbtn" id="btnRefresh">Refresh</button>
+      </div>
+      <div id="wireList" class="clippings"></div>
+    </section>
+    <section id="view-notebook" class="view">
+      <div class="panel wire-head">
+        <div><h2>Notebook</h2><p class="muted">Private. Lives in this browser only.</p></div>
+      </div>
+      <div id="noteGrid" class="note-grid"></div>
+    </section>
   </main>
+  <aside id="drawer" class="drawer" hidden><div class="drawer-inner" id="drawerInner"></div></aside>
+  <div id="modal" class="modal" hidden><form id="modalForm" class="paper-form"></form></div>
+  <div id="settings" class="drawer settings" hidden>
+    <div class="drawer-inner">
+      <header class="dossier-top">
+        <span class="stamp teal">Settings</span>
+        <button type="button" class="iconbtn" data-close="settings">✕</button>
+      </header>
+      <label class="row"><input type="checkbox" id="optStrings" checked /> Show red string</label>
+      <label class="row"><input type="checkbox" id="optMotion" /> Reduce motion</label>
+      <label class="row">Cork darkness <input type="range" id="optGrain" min="0" max="80" value="35" /></label>
+      <div class="row gap">
+        <button type="button" class="tagbtn" id="btnExport">Export JSON</button>
+        <button type="button" class="tagbtn ghost" id="btnImport">Import JSON</button>
+        <input type="file" id="importFile" accept="application/json" hidden />
+      </div>
+      <label class="row">Custom RSS URL <input type="url" id="optRss" placeholder="https://…" /></label>
+      <button type="button" class="tagbtn danger" id="btnResetSeed">Reset seed cases (keep notes)</button>
+    </div>
+  </div>
+  <div id="intro" class="intro" hidden>
+    <article class="intro-card">
+      <span class="pinhead big"></span>
+      <span class="stamp teal">First briefing</span>
+      <h2>This is a private corkboard.</h2>
+      <p>Pins and notes live in this browser. Headlines come from public feeds and always open at the source.</p>
+      <p>Accused people are innocent until a court says otherwise.</p>
+      <button type="button" class="tagbtn" id="btnOpenBoard">Open the board</button>
+    </article>
+  </div>
+  <div id="toast" class="toast" hidden></div>
+  <footer class="fineprint">
+    Unofficial personal tracker. Not affiliated with Court TV, any court, or any party.
+    Accused persons are presumed innocent. Sources linked. Not legal advice.
+  </footer>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
 </body>
 </html>
