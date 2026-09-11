@@ -85,7 +85,7 @@
       <button type="button" class="tagbtn danger" id="btnResetSeed">Reset seed cases (keep notes)</button>
     </div>
   </div>
-  <div id="intro" class="intro" hidden>
+  <div id="intro" class="intro">
     <article class="intro-card">
       <span class="pinhead big"></span>
       <span class="stamp teal">First briefing</span>
@@ -100,6 +100,26 @@
     Unofficial personal tracker. Not affiliated with Court TV, any court, or any party.
     Accused persons are presumed innocent. Sources linked. Not legal advice.
   </footer>
+  <script>
+    function dismissIntro() {
+      var el = document.getElementById('intro');
+      if (el) el.setAttribute('hidden', '');
+      try {
+        var raw = JSON.parse(localStorage.getItem('the-board/v1') || '{}');
+        raw.prefs = raw.prefs || {};
+        raw.prefs.seenIntro = true;
+        localStorage.setItem('the-board/v1', JSON.stringify(raw));
+      } catch (e) {}
+    }
+    document.getElementById('btnOpenBoard').addEventListener('click', dismissIntro);
+    document.getElementById('intro').addEventListener('click', function (e) {
+      if (e.target.id === 'intro') dismissIntro();
+    });
+    try {
+      var saved = JSON.parse(localStorage.getItem('the-board/v1') || '{}');
+      if (saved.prefs && saved.prefs.seenIntro) dismissIntro();
+    } catch (e) {}
+  </script>
   <script src="assets/data.js"></script>
   <script src="assets/app.js"></script>
 </body>
