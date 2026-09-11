@@ -56,7 +56,7 @@
       el.style.top = (c.boardY ?? 10) + "%";
       el.style.transform = `rotate(${c.rotation || 0}deg)`;
       el.dataset.id = c.id;
-      el.innerHTML = `<span class="tack" style="background:${c.color || "var(--red)"}"></span><div class="meta">${esc(c.court || "")}</div><h3>${esc(c.shortName || c.title)}</h3><span class="status ${c.status}">${esc(c.status)}</span><p>${esc((c.summary || "").slice(0, 140))}${(c.summary || "").length > 140 ? "…" : ""}</p>`;
+      el.innerHTML = `<span class="tack" style="background:${c.color || "var(--red)"}"></span><div class="meta">${esc(c.court || "")}</div><h3>${esc(c.shortName || c.title)}</h3><span class="status ${c.status}">${esc(c.status)}</span><p>${esc((c.summary || "").slice(0, 140))}${(c.summary || "").length > 140 ? "\u2026" : ""}</p>`;
       el.addEventListener("pointerdown", onDragStart);
       el.addEventListener("dblclick", () => openCase(c.id));
       board.appendChild(el);
@@ -135,19 +135,19 @@
       if (docketFilter === "court-tv") return (c.tags || []).includes("court-tv");
       return c.status === docketFilter;
     });
-    $("docketBody").innerHTML = rows.map((c) => `<tr data-id="${c.id}"><td><strong>${esc(c.shortName)}</strong><div class="meta">${esc(c.title)}</div></td><td><span class="status ${c.status}">${esc(c.status)}</span></td><td>${esc(c.court || "—")}</td><td>${esc(c.nextHearing || "—")}</td><td>${(c.tags || []).map(esc).join(", ")}</td></tr>`).join("");
+    $("docketBody").innerHTML = rows.map((c) => `<tr data-id="${c.id}"><td><strong>${esc(c.shortName)}</strong><div class="meta">${esc(c.title)}</div></td><td><span class="status ${c.status}">${esc(c.status)}</span></td><td>${esc(c.court || "-")}</td><td>${esc(c.nextHearing || "-")}</td><td>${(c.tags || []).map(esc).join(", ")}</td></tr>`).join("");
     $("docketBody").onclick = (e) => { const tr = e.target.closest("tr"); if (tr) openCase(tr.dataset.id); };
   }
   function renderWire() {
     $("livePill").classList.toggle("on", !!state.wire.live);
     $("livePill").textContent = state.wire.live ? "LIVE" : "WIRE";
-    $("wireMeta").textContent = state.wire.live ? `Court TV feed · ${state.wire.fetchedAt || ""}` : "Wire offline — showing last known clippings";
+    $("wireMeta").textContent = state.wire.live ? `Court TV feed \u00b7 ${state.wire.fetchedAt || ""}` : "Wire offline \u2014 showing last known clippings";
     const items = (state.wire.items || []).filter((h) => !state.hiddenHeadlines.includes(h.id));
     const s = q();
     const shown = items.filter((h) => !s || `${h.title} ${h.snippet}`.toLowerCase().includes(s));
     $("wireList").innerHTML = shown.map((h) => {
       const match = guessCase(h);
-      return `<article class="clip"><div class="src">${esc(h.source || "Court TV")} · ${esc(h.publishedAt || "")}</div><h3>${esc(h.title)}</h3><p>${esc(h.snippet || "")}</p><a href="${esc(h.url)}" target="_blank" rel="noopener">Open source ↗</a>${match ? `<div class="meta">Possible match: ${esc(match.shortName)}</div>` : ""}</article>`;
+      return `<article class="clip"><div class="src">${esc(h.source || "Court TV")} \u00b7 ${esc(h.publishedAt || "")}</div><h3>${esc(h.title)}</h3><p>${esc(h.snippet || "")}</p><a href="${esc(h.url)}" target="_blank" rel="noopener">Open source</a>${match ? `<div class="meta">Possible match: ${esc(match.shortName)}</div>` : ""}</article>`;
     }).join("") || "<p class='panel'>Nothing on the wire.</p>";
   }
   function guessCase(h) {
@@ -163,7 +163,7 @@
   function openCase(id) {
     const c = state.cases.find((x) => x.id === id); if (!c) return;
     const others = state.cases.filter((x) => x.id !== id);
-    $("drawerInner").innerHTML = `<header class="dossier-top"><span class="stamp">${esc(c.status)}</span><button type="button" class="iconbtn" data-close="drawer">✕</button></header><div class="meta">${esc(c.jurisdiction || "")} · ${esc(c.court || "")}</div><h2>${esc(c.title)}</h2><p class="lede">${esc(c.summary)}</p><p><em>${esc(c.whyItMatters || "")}</em></p><h3>Timeline</h3><ul>${(c.timeline || []).map((t) => `<li><span class="meta">${esc(t.date)}</span> ${esc(t.text)}</li>`).join("") || "<li>No events yet</li>"}</ul><form id="tlForm" class="row"><input name="date" placeholder="Date" /><input name="text" placeholder="What happened" /><button class="tagbtn" type="submit">Add event</button></form><h3>Sources</h3><div class="sources">${(c.sources || []).map((s) => `<div><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a></div>`).join("")}</div><div class="row gap" style="margin-top:1rem"><button type="button" class="tagbtn" id="pinToggle">${c.pinned === false ? "Pin" : "Unpin"}</button><select id="linkTo"><option value="">Link with red string…</option>${others.map((o) => `<option value="${o.id}">${esc(o.shortName)}</option>`).join("")}</select></div>`;
+    $("drawerInner").innerHTML = `<header class="dossier-top"><span class="stamp">${esc(c.status)}</span><button type="button" class="iconbtn" data-close="drawer">X</button></header><div class="meta">${esc(c.jurisdiction || "")} \u00b7 ${esc(c.court || "")}</div><h2>${esc(c.title)}</h2><p class="lede">${esc(c.summary)}</p><p><em>${esc(c.whyItMatters || "")}</em></p><h3>Timeline</h3><ul>${(c.timeline || []).map((t) => `<li><span class="meta">${esc(t.date)}</span> ${esc(t.text)}</li>`).join("") || "<li>No events yet</li>"}</ul><form id="tlForm" class="row"><input name="date" placeholder="Date" /><input name="text" placeholder="What happened" /><button class="tagbtn" type="submit">Add event</button></form><h3>Sources</h3><div class="sources">${(c.sources || []).map((s) => `<div><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a></div>`).join("")}</div><div class="row gap" style="margin-top:1rem"><button type="button" class="tagbtn" id="pinToggle">${c.pinned === false ? "Pin" : "Unpin"}</button><select id="linkTo"><option value="">Link with red string</option>${others.map((o) => `<option value="${o.id}">${esc(o.shortName)}</option>`).join("")}</select></div>`;
     $("drawer").hidden = false;
     $("drawerInner").querySelector("[data-close]").onclick = () => { $("drawer").hidden = true; };
     $("tlForm").onsubmit = (e) => {
@@ -224,7 +224,12 @@
     renderWire();
   }
   function esc(s) {
-    return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;" }[c]));
+    return String(s ?? "")
+      .replace(/&/g, "\u0026amp;")
+      .replace(/</g, "\u0026lt;")
+      .replace(/>/g, "\u0026gt;")
+      .replace(/"/g, "\u0026quot;")
+      .replace(/'/g, "\u0026#39;");
   }
   $("modes").addEventListener("click", (e) => { const a = e.target.closest("a"); if (!a) return; e.preventDefault(); setMode(a.dataset.mode); });
   window.addEventListener("hashchange", () => setMode((location.hash || "#board").slice(1)));
