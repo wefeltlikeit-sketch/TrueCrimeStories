@@ -1,0 +1,10 @@
+[build]
+  publish = "."
+  command = ""
+
+# Hash routes are used by the app, but this keeps deep links safe
+# if a bundler later introduces real paths.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
